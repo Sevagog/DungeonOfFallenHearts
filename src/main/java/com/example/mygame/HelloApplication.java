@@ -9,9 +9,10 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -25,7 +26,6 @@ import static java.lang.Math.abs;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        /* Для работы с любым разрешением
 
         Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
         double width = resolution.getWidth();
@@ -34,39 +34,47 @@ public class HelloApplication extends Application {
         double h = height/1080;
         Scale scale = new Scale(w, h, 0, 0);
 
-        root.getTransforms().add(scale);
-        */
 
         // Все возможные меню
-        AnchorPane mainMenu = new AnchorPane();
+        Pane mainMenu = new Pane();
         Scene maunMenuScene = new Scene(mainMenu, 1920, 1080);
-        AnchorPane playMenu = new AnchorPane();
+        Pane playMenu = new Pane();
         Scene playMenuScene = new Scene(playMenu, 1920, 1080);
 
-        AnchorPane shopMenu = new AnchorPane();
+        Pane shopMenu = new Pane();
         Scene shopMenuScene = new Scene(shopMenu, 1920, 1080);
 
-        AnchorPane settingsMenu = new AnchorPane();
+        Pane settingsMenu = new Pane();
         Scene settingsMenuScene = new Scene(settingsMenu, 1920, 1080);
 
-        AnchorPane bestiaryMenu = new AnchorPane();
+        Pane bestiaryMenu = new Pane();
         Scene bestiaryMenuScene = new Scene(bestiaryMenu, 1920, 1080);
 
         // Для главного меню
         ImageView menuBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_background.png"))); menuBackgroundImage.setLayoutX(-40);
         ImageView menuNavigatorImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_navigator.png")));
-        HBox mainMenuHBox = new HBox(); AnchorPane.setLeftAnchor(mainMenuHBox, 0.0); AnchorPane.setRightAnchor(mainMenuHBox, 0.0); mainMenuHBox.setAlignment(Pos.BASELINE_CENTER); mainMenuHBox.getChildren().add(menuNavigatorImage); mainMenuHBox.setLayoutY(146);
+        menuNavigatorImage.setLayoutX(628);
+        menuNavigatorImage.setLayoutY(145);
         Label playButton = new Label("Играть"); playButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        AnchorPane.setLeftAnchor(playButton, 0.0); AnchorPane.setRightAnchor(playButton, 0.0); playButton.setAlignment(Pos.BASELINE_CENTER); AnchorPane.setTopAnchor(playButton, 189.0);
+        playButton.setLayoutX(878);
+        playButton.setLayoutY(183);
         Label shopButton = new Label("Магазин"); shopButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        AnchorPane.setLeftAnchor(shopButton, 0.0); AnchorPane.setRightAnchor(shopButton, 0.0); shopButton.setAlignment(Pos.BASELINE_CENTER); AnchorPane.setTopAnchor(shopButton, 363.0);
+        shopButton.setLayoutX(860);
+        shopButton.setLayoutY(359);
         Label bestiaryButton = new Label("Бестиарий"); bestiaryButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        AnchorPane.setLeftAnchor(bestiaryButton, 0.0); AnchorPane.setRightAnchor(bestiaryButton, 0.0); bestiaryButton.setAlignment(Pos.BASELINE_CENTER); AnchorPane.setTopAnchor(bestiaryButton, 545.0);
+        bestiaryButton.setLayoutX(828);
+        bestiaryButton.setLayoutY(539);
         Label settingsButton = new Label("Настройки"); settingsButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        AnchorPane.setLeftAnchor(settingsButton, 0.0); AnchorPane.setRightAnchor(settingsButton, 0.0); settingsButton.setAlignment(Pos.BASELINE_CENTER); AnchorPane.setTopAnchor(settingsButton, 725.0);
+        settingsButton.setLayoutX(828);
+        settingsButton.setLayoutY(717);
         Label exitButton = new Label("Выход"); exitButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        AnchorPane.setLeftAnchor(exitButton, 0.0); AnchorPane.setRightAnchor(exitButton, 0.0); exitButton.setAlignment(Pos.BASELINE_CENTER); AnchorPane.setTopAnchor(exitButton, 895.0);
-        mainMenu.getChildren().addAll(menuBackgroundImage, mainMenuHBox, playButton, shopButton, bestiaryButton, settingsButton, exitButton);
+        exitButton.setLayoutX(878);
+        exitButton.setLayoutY(891);
+
+        mainMenu.getChildren().addAll(menuBackgroundImage, menuNavigatorImage, playButton, shopButton, bestiaryButton, settingsButton, exitButton);
+
+        mainMenu.getTransforms().add(scale);
+        playMenu.getTransforms().add(scale);
 
         // Для меню выбора персонажа
         ImageView playMenuBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/play_menu_background.png"))); playMenuBackgroundImage.setLayoutX(-40);
@@ -77,7 +85,8 @@ public class HelloApplication extends Application {
 
         stage.setTitle("Dungeon Of Fallen Hearts");
         stage.setScene(maunMenuScene);
-        stage.initStyle(StageStyle.UNDECORATED);
+        //stage.initStyle(StageStyle.DECORATED);
+        stage.setFullScreen(true);
         stage.setMaximized(true);
         stage.show();
 
@@ -97,16 +106,18 @@ public class HelloApplication extends Application {
                     menuNavigator[0] = (menuNavigator[0] - 1) % 5;
                     if(menuNavigator[0] < 0)
                         menuNavigator[0] = 4;
-                    mainMenuHBox.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
+                    menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
                     break;
                 case S:
                     menuNavigator[0] = (menuNavigator[0] + 1) % 5;
-                    mainMenuHBox.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
+                    menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
                     break;
                 case SPACE:
                     switch (menuNavigator[0]){
                         case 0:
                             stage.setScene(playMenuScene);
+                            stage.setFullScreen(true);
+                            stage.setMaximized(true);
                             break;
                         case 1:
                             stage.setScene(shopMenuScene); // TODO Магазин
