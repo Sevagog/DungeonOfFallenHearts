@@ -3,6 +3,7 @@ package com.example.mygame;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -32,10 +33,12 @@ public class HelloApplication extends Application {
         double height = resolution.getHeight();
         double w = width/1920;
         double h = height/1080;
+        System.out.println(width + " - " + w);
+        System.out.println(height + " - " + h);
         Scale scale = new Scale(w, h, 0, 0);
 
 
-        // Все возможные меню
+        // Все возможные менюss
         Pane mainMenu = new Pane();
         Scene maunMenuScene = new Scene(mainMenu, 1920, 1080);
         Pane playMenu = new Pane();
@@ -120,9 +123,9 @@ public class HelloApplication extends Application {
                 case SPACE:
                     switch (menuNavigator[0]){
                         case 0:
-                            stage.setScene(playMenuScene);
+                            stage.getScene().setRoot(new Parent() {
+                            });
                             stage.setFullScreen(true);
-                            stage.setMaximized(true);
                             break;
                         case 1:
                             stage.setScene(shopMenuScene); // TODO Магазин
