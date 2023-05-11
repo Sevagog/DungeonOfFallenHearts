@@ -2,26 +2,21 @@ package com.example.mygame;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
-
-import static java.lang.Math.abs;
 
 
 public class HelloApplication extends Application {
@@ -33,56 +28,33 @@ public class HelloApplication extends Application {
         double height = resolution.getHeight();
         double w = width/1920;
         double h = height/1080;
-        System.out.println(width + " - " + w);
-        System.out.println(height + " - " + h);
         Scale scale = new Scale(w, h, 0, 0);
 
+        // Все возможные меню
+        Pane mainMenu = new Pane(); mainMenu.getTransforms().add(scale);
+        Pane playMenu = new Pane(); playMenu.getTransforms().add(scale);
+        Pane shopMenu = new Pane(); shopMenu.getTransforms().add(scale);
+        Pane settingsMenu = new Pane(); settingsMenu.getTransforms().add(scale);
+        Pane bestiaryMenu = new Pane(); bestiaryMenu.getTransforms().add(scale);
 
-        // Все возможные менюss
-        Pane mainMenu = new Pane();
-        Scene maunMenuScene = new Scene(mainMenu, 1920, 1080);
-        Pane playMenu = new Pane();
-        Scene playMenuScene = new Scene(playMenu, 1920, 1080);
-
-        Pane shopMenu = new Pane();
-        Scene shopMenuScene = new Scene(shopMenu, 1920, 1080);
-
-        Pane settingsMenu = new Pane();
-        Scene settingsMenuScene = new Scene(settingsMenu, 1920, 1080);
-
-        Pane bestiaryMenu = new Pane();
-        Scene bestiaryMenuScene = new Scene(bestiaryMenu, 1920, 1080);
+        Scene maunScene = new Scene(mainMenu, 1920, 1080);
 
         // Для главного меню
         ImageView menuBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_background.png"))); menuBackgroundImage.setLayoutX(-40);
         ImageView menuNavigatorImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_navigator.png")));
-        menuNavigatorImage.setLayoutX(628);
-        menuNavigatorImage.setLayoutY(145);
+        menuNavigatorImage.setLayoutX(628); menuNavigatorImage.setLayoutY(145);
 
         Label playButton = new Label("Играть"); playButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        playButton.setLayoutX(878);
-        playButton.setLayoutY(183);
-
+        playButton.setLayoutX(878); playButton.setLayoutY(183);
         Label shopButton = new Label("Магазин"); shopButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        shopButton.setLayoutX(860);
-        shopButton.setLayoutY(359);
-
+        shopButton.setLayoutX(860); shopButton.setLayoutY(359);
         Label bestiaryButton = new Label("Бестиарий"); bestiaryButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        bestiaryButton.setLayoutX(828);
-        bestiaryButton.setLayoutY(539);
-
+        bestiaryButton.setLayoutX(828); bestiaryButton.setLayoutY(539);
         Label settingsButton = new Label("Настройки"); settingsButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        settingsButton.setLayoutX(828);
-        settingsButton.setLayoutY(717);
-
+        settingsButton.setLayoutX(828); settingsButton.setLayoutY(717);
         Label exitButton = new Label("Выход"); exitButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        exitButton.setLayoutX(878);
-        exitButton.setLayoutY(891);
-
+        exitButton.setLayoutX(878); exitButton.setLayoutY(891);
         mainMenu.getChildren().addAll(menuBackgroundImage, menuNavigatorImage, playButton, shopButton, bestiaryButton, settingsButton, exitButton);
-
-        mainMenu.getTransforms().add(scale);
-        playMenu.getTransforms().add(scale);
 
         // Для меню выбора персонажа
         ImageView playMenuBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/play_menu_background.png"))); playMenuBackgroundImage.setLayoutX(-40);
@@ -92,13 +64,14 @@ public class HelloApplication extends Application {
         playMenu.getChildren().addAll(playMenuBackgroundImage, playMenuNavigatorImage, playMenuSliderNavigatorImage, playMenuSliderImage);
 
         stage.setTitle("Dungeon Of Fallen Hearts");
-        stage.setScene(maunMenuScene);
-        //stage.initStyle(StageStyle.DECORATED);
+        stage.setScene(maunScene);
+        stage.setFullScreenExitHint("");
+        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setFullScreen(true);
-        stage.setMaximized(true);
         stage.show();
 
         // Переменные для логики
+        String[] pane = {"mainMenu"};
         int[] menuNavigator = new int[2];
         double[] menuNavigatorImageLocation = {145, 321, 501, 679, 853};
         double[] playMenuNavigatorImageLocationY = {78, 229, 373, 510};
@@ -108,94 +81,109 @@ public class HelloApplication extends Application {
         boolean[] isCharacterSelected = {false};
         int[] selectedHero = {0};
 
-        maunMenuScene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
-            switch (key.getCode()){
-                case W:
-                    menuNavigator[0] = (menuNavigator[0] - 1) % 5;
-                    if(menuNavigator[0] < 0)
-                        menuNavigator[0] = 4;
-                    menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
-                    break;
-                case S:
-                    menuNavigator[0] = (menuNavigator[0] + 1) % 5;
-                    menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
-                    break;
-                case SPACE:
-                    switch (menuNavigator[0]){
-                        case 0:
-                            stage.getScene().setRoot(new Parent() {
-                            });
-                            stage.setFullScreen(true);
+        maunScene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
+            switch (pane[0]){
+                case "mainMenu":
+                    switch (key.getCode()){
+                        case W:
+                            menuNavigator[0] = (menuNavigator[0] - 1) % 5;
+                            if(menuNavigator[0] < 0)
+                                menuNavigator[0] = 4;
+                            menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
                             break;
-                        case 1:
-                            stage.setScene(shopMenuScene); // TODO Магазин
+                        case S:
+                            menuNavigator[0] = (menuNavigator[0] + 1) % 5;
+                            menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
                             break;
-                        case 2:
-                            stage.setScene(bestiaryMenuScene); // TODO Бестиарий
-                            break;
-                        case 3:
-                            stage.setScene(settingsMenuScene); // TODO Настройки
-                            break;
-                        default:
-                            Platform.exit();
+                        case SPACE:
+                            switch (menuNavigator[0]){
+                                case 0:
+                                    maunScene.setRoot(playMenu);
+                                    pane[0] = "playMenu";
+                                    break;
+                                case 1:
+                                    maunScene.setRoot(shopMenu); // TODO Магазин
+                                    pane[0] = "shopMenu";
+                                    break;
+                                case 2:
+                                    maunScene.setRoot(bestiaryMenu); // TODO Бестиарий
+                                    pane[0] = "bestiaryMenu";
+                                    break;
+                                case 3:
+                                    maunScene.setRoot(settingsMenu); // TODO Настройки
+                                    pane[0] = "settingsMenu";
+                                    break;
+                                default:
+                                    Platform.exit();
+                                    break;
+                            }
+                            menuNavigator[0] = 0;
                             break;
                     }
-                    menuNavigator[0] = 0;
                     break;
-            }
-        });
-        playMenuScene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
-            if(isCharacterSelected[0]) {
-                switch (key.getCode()){
-                    case A:
-                        menuNavigator[0] = (menuNavigator[0] - 1) % 5;
-                        if (menuNavigator[0] < 0)
-                            menuNavigator[0] = 4;
-                        playMenuSliderImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]);
-                        playMenuSliderNavigatorImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]-51);
-                        break;
-                    case D:
-                        menuNavigator[0] = (menuNavigator[0] + 1) % 5;
-                        playMenuSliderImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]);
-                        playMenuSliderNavigatorImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]-51);
-                        break;
-                    case SPACE:
+                case "playMenu":
+                    if(isCharacterSelected[0]) {
+                        switch (key.getCode()){
+                            case A:
+                                menuNavigator[0] = (menuNavigator[0] - 1) % 5;
+                                if (menuNavigator[0] < 0)
+                                    menuNavigator[0] = 4;
+                                playMenuSliderImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]);
+                                playMenuSliderNavigatorImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]-51);
+                                break;
+                            case D:
+                                menuNavigator[0] = (menuNavigator[0] + 1) % 5;
+                                playMenuSliderImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]);
+                                playMenuSliderNavigatorImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]-51);
+                                break;
+                            case SPACE:
 
-                        break;
-                }
-            } else {
-                switch (key.getCode()) {
-                    case W:
-                        menuNavigator[0] = (menuNavigator[0] - 1) % 4;
-                        if (menuNavigator[0] < 0)
-                            menuNavigator[0] = 3;
-                        playMenuNavigatorImage.setLayoutY(playMenuNavigatorImageLocationY[menuNavigator[0]]);
-                        break;
-                    case S:
-                        menuNavigator[0] = (menuNavigator[0] + 1) % 4;
-                        playMenuNavigatorImage.setLayoutY(playMenuNavigatorImageLocationY[menuNavigator[0]]);
-                        break;
-                    case A:
-                        menuNavigator[1] = (menuNavigator[1] - 1) % 5;
-                        if (menuNavigator[1] < 0)
-                            menuNavigator[1] = 4;
-                        playMenuNavigatorImage.setLayoutX(playMenuNavigatorImageLocationX[menuNavigator[1]]);
-                        break;
-                    case D:
-                        menuNavigator[1] = (menuNavigator[1] + 1) % 5;
-                        playMenuNavigatorImage.setLayoutX(playMenuNavigatorImageLocationX[menuNavigator[1]]);
-                        break;
-                    case SPACE:
-                        if (unlockedHeroes[menuNavigator[0]][menuNavigator[1]]) {
-                            isCharacterSelected[0] = true;
-                            playMenuNavigatorImage.setOpacity(0.0);
-                            playMenuSliderNavigatorImage.setOpacity(1.0);
-                            selectedHero[0] = menuNavigator[0] * 5 + menuNavigator[1];
-                            menuNavigator[0] = 0; menuNavigator[1] = 0;
-                            // Todo Убрать обводку персонажа, добавить обводку слайдера
+                                break;
                         }
-                        break;
-                }
+                    } else {
+                        switch (key.getCode()) {
+                            case W:
+                                menuNavigator[0] = (menuNavigator[0] - 1) % 4;
+                                if (menuNavigator[0] < 0)
+                                    menuNavigator[0] = 3;
+                                playMenuNavigatorImage.setLayoutY(playMenuNavigatorImageLocationY[menuNavigator[0]]);
+                                break;
+                            case S:
+                                menuNavigator[0] = (menuNavigator[0] + 1) % 4;
+                                playMenuNavigatorImage.setLayoutY(playMenuNavigatorImageLocationY[menuNavigator[0]]);
+                                break;
+                            case A:
+                                menuNavigator[1] = (menuNavigator[1] - 1) % 5;
+                                if (menuNavigator[1] < 0)
+                                    menuNavigator[1] = 4;
+                                playMenuNavigatorImage.setLayoutX(playMenuNavigatorImageLocationX[menuNavigator[1]]);
+                                break;
+                            case D:
+                                menuNavigator[1] = (menuNavigator[1] + 1) % 5;
+                                playMenuNavigatorImage.setLayoutX(playMenuNavigatorImageLocationX[menuNavigator[1]]);
+                                break;
+                            case SPACE:
+                                if (unlockedHeroes[menuNavigator[0]][menuNavigator[1]]) {
+                                    isCharacterSelected[0] = true;
+                                    playMenuNavigatorImage.setOpacity(0.0);
+                                    playMenuSliderNavigatorImage.setOpacity(1.0);
+                                    selectedHero[0] = menuNavigator[0] * 5 + menuNavigator[1];
+                                    menuNavigator[0] = 0; menuNavigator[1] = 0;
+                                    // Todo Убрать обводку персонажа, добавить обводку слайдера
+                                }
+                                break;
+                        }
+                    }
+                    break;
+                case "shopMenu":
+
+                    break;
+                case "bestiaryMenu":
+
+                    break;
+                case "settingsMenu":
+
+                    break;
             }
         });
     }
