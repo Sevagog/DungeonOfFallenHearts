@@ -55,18 +55,23 @@ public class HelloApplication extends Application {
         ImageView menuNavigatorImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_navigator.png")));
         menuNavigatorImage.setLayoutX(628);
         menuNavigatorImage.setLayoutY(145);
+
         Label playButton = new Label("Играть"); playButton.setFont(Font.font("Franklin Gothic Medium", 55));
         playButton.setLayoutX(878);
         playButton.setLayoutY(183);
+
         Label shopButton = new Label("Магазин"); shopButton.setFont(Font.font("Franklin Gothic Medium", 55));
         shopButton.setLayoutX(860);
         shopButton.setLayoutY(359);
+
         Label bestiaryButton = new Label("Бестиарий"); bestiaryButton.setFont(Font.font("Franklin Gothic Medium", 55));
         bestiaryButton.setLayoutX(828);
         bestiaryButton.setLayoutY(539);
+
         Label settingsButton = new Label("Настройки"); settingsButton.setFont(Font.font("Franklin Gothic Medium", 55));
         settingsButton.setLayoutX(828);
         settingsButton.setLayoutY(717);
+
         Label exitButton = new Label("Выход"); exitButton.setFont(Font.font("Franklin Gothic Medium", 55));
         exitButton.setLayoutX(878);
         exitButton.setLayoutY(891);
