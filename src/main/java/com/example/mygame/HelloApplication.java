@@ -10,6 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
@@ -17,9 +18,17 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class HelloApplication extends Application {
+    Label playButton = new Label("Играть");
+    Label shopButton = new Label("Магазин");
+    Label bestiaryButton = new Label("Бестиарий");
+    Label settingsButton = new Label("Настройки");
+    Label exitButton = new Label("Выход");
+    Label[] mainMenuLabels = {playButton, shopButton, bestiaryButton, settingsButton, exitButton};
+
     @Override
     public void start(Stage stage) throws IOException {
 
@@ -44,16 +53,19 @@ public class HelloApplication extends Application {
         ImageView menuNavigatorImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_navigator.png")));
         menuNavigatorImage.setLayoutX(628); menuNavigatorImage.setLayoutY(145);
 
-        Label playButton = new Label("Играть"); playButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        playButton.setLayoutX(878); playButton.setLayoutY(183);
-        Label shopButton = new Label("Магазин"); shopButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        shopButton.setLayoutX(860); shopButton.setLayoutY(359);
-        Label bestiaryButton = new Label("Бестиарий"); bestiaryButton.setFont(Font.font("Franklin Gothic Medium", 55));
+        // Baoli SC
+        // Impact
+        // Charter
+        playButton.setFont(Font.font("Hoefler Text", 55)); playButton.setTextFill(Color.rgb(98, 17,17));
+        playButton.setLayoutX(874); playButton.setLayoutY(183);
+        shopButton.setFont(Font.font("Hoefler Text", 55)); shopButton.setTextFill(Color.rgb(98, 17,17));
+        shopButton.setLayoutX(858); shopButton.setLayoutY(359);
+        bestiaryButton.setFont(Font.font("Hoefler Text", 55)); bestiaryButton.setTextFill(Color.rgb(98, 17,17));
         bestiaryButton.setLayoutX(828); bestiaryButton.setLayoutY(539);
-        Label settingsButton = new Label("Настройки"); settingsButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        settingsButton.setLayoutX(828); settingsButton.setLayoutY(717);
-        Label exitButton = new Label("Выход"); exitButton.setFont(Font.font("Franklin Gothic Medium", 55));
-        exitButton.setLayoutX(878); exitButton.setLayoutY(891);
+        settingsButton.setFont(Font.font("Hoefler Text", 54)); settingsButton.setTextFill(Color.rgb(98, 17,17));
+        settingsButton.setLayoutX(824); settingsButton.setLayoutY(717);
+        exitButton.setFont(Font.font("Hoefler Text", 55)); exitButton.setTextFill(Color.rgb(98, 17,17));
+        exitButton.setLayoutX(874); exitButton.setLayoutY(891);
         mainMenu.getChildren().addAll(menuBackgroundImage, menuNavigatorImage, playButton, shopButton, bestiaryButton, settingsButton, exitButton);
 
         // Для меню выбора персонажа
@@ -90,10 +102,12 @@ public class HelloApplication extends Application {
                             if(menuNavigator[0] < 0)
                                 menuNavigator[0] = 4;
                             menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
+                            mainMenuNavigatorIdicator(menuNavigator[0]);
                             break;
                         case S:
                             menuNavigator[0] = (menuNavigator[0] + 1) % 5;
                             menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
+                            mainMenuNavigatorIdicator(menuNavigator[0]);
                             break;
                         case SPACE:
                             switch (menuNavigator[0]){
@@ -186,7 +200,32 @@ public class HelloApplication extends Application {
                     break;
             }
         });
+
+
     }
+
+    private void mainMenuNavigatorIdicator(int i) {
+        for (int j = 0; j < 5; j++) {
+            mainMenuLabels[j].setTextFill(Color.rgb(98, 17,17));
+        }
+        switch (i){
+            case 0:
+                playButton.setTextFill(Color.rgb(255, 255,255));
+                break;
+            case 1:
+                shopButton.setTextFill(Color.rgb(255, 255,255));
+                break;
+            case 2:
+                bestiaryButton.setTextFill(Color.rgb(255, 255,255));
+                break;
+            case 3:
+                settingsButton.setTextFill(Color.rgb(255, 255,255));
+                break;
+            case 4:
+                exitButton.setTextFill(Color.rgb(255, 255,255));
+        }
+    }
+
 
     public static void main(String[] args) {
         launch();
