@@ -119,6 +119,8 @@ public class HelloApplication extends Application {
         int[] selectedHero = {0};
         boolean[] pressed = {false, false, false, false, false}; // W A S D Space
         boolean[] isReverted = {false}; boolean[] isRotated = {false};
+        int[] footPos = {1}; // 0 - право; 1 - начальная; 2 - лево
+        short[] timer = {0};
         Rotate imageFlip = new Rotate(180, Rotate.Y_AXIS);
         Rotate playerRotPlus = new Rotate(15, Rotate.Z_AXIS);
         Rotate playerRotMinus = new Rotate(-15, Rotate.Z_AXIS);
@@ -129,6 +131,8 @@ public class HelloApplication extends Application {
             }
             protected void interpolate(double frac) {
                 // ЛОГИКА ИГРЫ ТУТ
+                timer[0] += 1;
+                if(timer[0] == Short.MAX_VALUE) timer[0] = 0;
                 for (int i = 0; i < 4; i++){
                     if(pressed[0]){
                         floorImage[i].setLayoutY(floorImage[i].getLayoutY() + 10);
@@ -143,12 +147,14 @@ public class HelloApplication extends Application {
                             playerWeaponInGame.getTransforms().add(imageFlip);
                             playerHeadInGame.setLayoutX(gamePlayPlayerHead[0][selectedHero[0]]);
                             playerWeaponInGame.setLayoutX(gamePlayPlayerWeapon[0][selectedHero[0]]);
-                            playerFootInGame.setLayoutX(848);
+                            //playerFootInGame.setLayoutX(848);
                             playerBodyInGame.setLayoutX(708);
                         }
                         if(!isRotated[0] && !pressed[3]){
                             playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()+17);
+                            playerFootInGame.setLayoutY(playerFootInGame.getLayoutY()+8);
                             playerBodyInGame.getTransforms().add(playerRotMinus);
+                            playerFootInGame.getTransforms().add(playerRotMinus);
                             isRotated[0] = true;
                         }
                     }
@@ -165,14 +171,41 @@ public class HelloApplication extends Application {
                             playerWeaponInGame.getTransforms().add(imageFlip);
                             playerHeadInGame.setLayoutX(gamePlayPlayerHeadReverted[selectedHero[0]]);
                             playerWeaponInGame.setLayoutX(gamePlayPlayerWeaponReverted[selectedHero[0]]);
-                            playerFootInGame.setLayoutX(898);
+                            //playerFootInGame.setLayoutX(898);
                             playerBodyInGame.setLayoutX(841);
                         }
                         if(!isRotated[0] && !pressed[1]){
                             playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()+17);
+                            playerFootInGame.setLayoutY(playerFootInGame.getLayoutY()+8);
                             playerBodyInGame.getTransforms().add(playerRotMinus);
+                            playerFootInGame.getTransforms().add(playerRotMinus);
                             isRotated[0] = true;
                         }
+                    }
+                }
+                // Контроль ноги
+                if(timer[0] % 4 == 0 && (pressed[0] || pressed[1] || pressed[2] || pressed[3])){
+                    footPos[0] = (footPos[0] + 1) % 3;
+                    if (isReverted[0]){
+                        if(isRotated[0]){
+                            playerFootInGame.setLayoutX(889);
+                        } else {
+                            playerFootInGame.setLayoutX(898);
+                        }
+                    } else {
+                        if(isRotated[0]){
+                            playerFootInGame.setLayoutX(857);
+                        } else {
+                            playerFootInGame.setLayoutX(848);
+                        }
+                    }
+                    switch (footPos[0]){
+                        case 0:
+                            playerFootInGame.setLayoutX(playerFootInGame.getLayoutX()-5);
+                            break;
+                        case 2:
+                            playerFootInGame.setLayoutX(playerFootInGame.getLayoutX()+5);
+                            break;
                     }
                 }
                 // Создает бесконечность поля
@@ -352,7 +385,9 @@ public class HelloApplication extends Application {
                         if(isRotated[0]){
                             isRotated[0] = false;
                             playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()-17);
+                            playerFootInGame.setLayoutY(playerFootInGame.getLayoutY()-8);
                             playerBodyInGame.getTransforms().add(playerRotPlus);
+                            playerFootInGame.getTransforms().add(playerRotPlus);
                         }
                         break;
                     case S:
@@ -369,7 +404,9 @@ public class HelloApplication extends Application {
                         if(isRotated[0]){
                             isRotated[0] = false;
                             playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()-17);
+                            playerFootInGame.setLayoutY(playerFootInGame.getLayoutY()-8);
                             playerBodyInGame.getTransforms().add(playerRotPlus);
+                            playerFootInGame.getTransforms().add(playerRotPlus);
                         }
                         break;
                     case SPACE:
