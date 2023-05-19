@@ -93,7 +93,6 @@ public class HelloApplication extends Application {
         floorImage[2].setLayoutX(-1500); floorImage[2].setLayoutY(1500);
         floorImage[3].setLayoutX(2764); floorImage[3].setLayoutY(1500);
         gamePlay.getChildren().addAll(playerWeaponInGame, playerFootInGame, playerBodyInGame, playerHeadInGame);
-        Rotate imageFlip = new Rotate(180, Rotate.Y_AXIS);
 
         stage.setTitle("Dungeon Of Fallen Hearts");
         stage.setScene(maunScene);
@@ -113,13 +112,16 @@ public class HelloApplication extends Application {
         double[][] playMenuPlayerWeapon = {{905, 905, 905}, {350, 350, 350}}; // Первый столбик - Х, второй - Y.
         double[][] gamePlayPlayerHead = {{740, 790, 955}, {412, 402, 268}}; // Первый столбик - Х, второй - Y.
         double[][] gamePlayPlayerWeapon = {{740, 740, 740}, {410, 410, 410}}; // Первый столбик - Х, второй - Y.
-        double[] gamePlayPlayerHeadReverted = {870, 790, 955};
+        double[] gamePlayPlayerHeadReverted = {870, 880, 880};
         double[] gamePlayPlayerWeaponReverted = {860, 860, 860};
         boolean[][] unlockedHeroes = new boolean[4][5]; unlockedHeroes[0][0] = true; unlockedHeroes[0][1] = true; unlockedHeroes[0][2] = true;
         boolean[] isCharacterSelected = {false};
         int[] selectedHero = {0};
         boolean[] pressed = {false, false, false, false, false}; // W A S D Space
-        boolean[] isReverted = {false};
+        boolean[] isReverted = {false}; boolean[] isRotated = {false};
+        Rotate imageFlip = new Rotate(180, Rotate.Y_AXIS);
+        Rotate playerRotPlus = new Rotate(15, Rotate.Z_AXIS);
+        Rotate playerRotMinus = new Rotate(-15, Rotate.Z_AXIS);
 
         final Animation gameAnimation = new Transition() {
             {
@@ -144,6 +146,11 @@ public class HelloApplication extends Application {
                             playerFootInGame.setLayoutX(848);
                             playerBodyInGame.setLayoutX(708);
                         }
+                        if(!isRotated[0] && !pressed[3]){
+                            playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()+17);
+                            playerBodyInGame.getTransforms().add(playerRotMinus);
+                            isRotated[0] = true;
+                        }
                     }
                     if(pressed[2]){
                         floorImage[i].setLayoutY(floorImage[i].getLayoutY() - 10);
@@ -160,6 +167,11 @@ public class HelloApplication extends Application {
                             playerWeaponInGame.setLayoutX(gamePlayPlayerWeaponReverted[selectedHero[0]]);
                             playerFootInGame.setLayoutX(898);
                             playerBodyInGame.setLayoutX(841);
+                        }
+                        if(!isRotated[0] && !pressed[1]){
+                            playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()+17);
+                            playerBodyInGame.getTransforms().add(playerRotMinus);
+                            isRotated[0] = true;
                         }
                     }
                 }
@@ -331,12 +343,34 @@ public class HelloApplication extends Application {
                         break;
                     case A:
                         pressed[1] = false;
+                        if(!pressed[3]){
+                            playerHeadInGame.setLayoutX(gamePlayPlayerHead[0][selectedHero[0]]);
+                            playerWeaponInGame.setLayoutX(gamePlayPlayerWeapon[0][selectedHero[0]]);
+                            playerFootInGame.setLayoutX(848);
+                            playerBodyInGame.setLayoutX(708);
+                        }
+                        if(isRotated[0]){
+                            isRotated[0] = false;
+                            playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()-17);
+                            playerBodyInGame.getTransforms().add(playerRotPlus);
+                        }
                         break;
                     case S:
                         pressed[2] = false;
                         break;
                     case D:
                         pressed[3] = false;
+                        if(!pressed[1]){
+                            playerHeadInGame.setLayoutX(gamePlayPlayerHeadReverted[selectedHero[0]]);
+                            playerWeaponInGame.setLayoutX(gamePlayPlayerWeaponReverted[selectedHero[0]]);
+                            playerFootInGame.setLayoutX(898);
+                            playerBodyInGame.setLayoutX(841);
+                        }
+                        if(isRotated[0]){
+                            isRotated[0] = false;
+                            playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()-17);
+                            playerBodyInGame.getTransforms().add(playerRotPlus);
+                        }
                         break;
                     case SPACE:
 
