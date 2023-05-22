@@ -4,6 +4,7 @@ import javafx.animation.Animation;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.CacheHint;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -21,6 +22,9 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Objects;
+
+import static java.lang.Math.abs;
 
 
 public class HelloApplication extends Application {
@@ -28,11 +32,7 @@ public class HelloApplication extends Application {
     public void start(Stage stage) throws IOException {
 
         Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
-        double width = resolution.getWidth();
-        double height = resolution.getHeight();
-        double w = width/1920;
-        double h = height/1080;
-        Scale scale = new Scale(w, h, 0, 0);
+        Scale scale = new Scale(resolution.getWidth()/1920, resolution.getHeight()/1080, 0, 0);
 
         // Все возможные меню
         Pane mainMenu = new Pane(); mainMenu.getTransforms().add(scale);
@@ -86,13 +86,19 @@ public class HelloApplication extends Application {
         ImageView[] floorImage = new ImageView[4];
         for (int i = 0; i < 4; i++){
             floorImage[i] = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/floor.png")));
-            gamePlay.getChildren().add(floorImage[i]);
         }
-        floorImage[0].setLayoutX(-1500); floorImage[0].setLayoutY(-1500);
-        floorImage[1].setLayoutX(2764); floorImage[1].setLayoutY(-1500);
-        floorImage[2].setLayoutX(-1500); floorImage[2].setLayoutY(1500);
-        floorImage[3].setLayoutX(2764); floorImage[3].setLayoutY(1500);
+        int[] floorCoords = {-900, -100}; // X и Y
+        floorImage[0].setLayoutY(floorCoords[1]);
+        floorImage[1].setLayoutY(floorCoords[1]);
+        floorImage[2].setLayoutY(floorCoords[1] + 1490);
+        floorImage[3].setLayoutY(floorCoords[1] + 1490);
+        floorImage[0].setLayoutX(floorCoords[0]);
+        floorImage[1].setLayoutX(floorCoords[0] + 2128);
+        floorImage[2].setLayoutX(floorCoords[0]);
+        floorImage[3].setLayoutX(floorCoords[0] + 2128);
+        gamePlay.getChildren().addAll(floorImage[0], floorImage[1], floorImage[2], floorImage[3]);
         gamePlay.getChildren().addAll(playerWeaponInGame, playerFootInGame, playerBodyInGame, playerHeadInGame);
+        gamePlay.setCache(true); gamePlay.setCacheHint(CacheHint.QUALITY);
 
         stage.setTitle("Dungeon Of Fallen Hearts");
         stage.setScene(maunScene);
@@ -103,24 +109,22 @@ public class HelloApplication extends Application {
 
         // Переменные для логики
         String[] pane = {"mainMenu"};
-        int[] menuNavigator = new int[2];
+        byte[] menuNavigator = new byte[2];
         double[] menuNavigatorImageLocation = {145, 321, 501, 679, 853};
         double[] playMenuNavigatorImageLocationY = {78, 229, 373, 510};
         double[] playMenuNavigatorImageLocationX = {41, 187, 335, 482, 623};
         double[] playMenuSliderImageLocation = {67, 194, 318, 443, 582};
         double[][] playMenuPlayerHead = {{895, 955, 955}, {282, 268, 268}}; // Первый столбик - Х, второй - Y.
         double[][] playMenuPlayerWeapon = {{905, 905, 905}, {350, 350, 350}}; // Первый столбик - Х, второй - Y.
-        double[][] gamePlayPlayerHead = {{740, 790, 955}, {412, 402, 268}}; // Первый столбик - Х, второй - Y.
-        double[][] gamePlayPlayerWeapon = {{740, 740, 740}, {410, 410, 410}}; // Первый столбик - Х, второй - Y.
-        double[] gamePlayPlayerHeadReverted = {870, 880, 880};
-        double[] gamePlayPlayerWeaponReverted = {860, 860, 860};
+        Hero hero = new Hero();
         boolean[][] unlockedHeroes = new boolean[4][5]; unlockedHeroes[0][0] = true; unlockedHeroes[0][1] = true; unlockedHeroes[0][2] = true;
-        boolean[] isCharacterSelected = {false};
-        int[] selectedHero = {0};
         boolean[] pressed = {false, false, false, false, false}; // W A S D Space
         boolean[] isReverted = {false}; boolean[] isRotated = {false};
-        int[] footPos = {1}; // 0 - право; 1 - начальная; 2 - лево
-        short[] timer = {0};
+        byte[] footPos = {1}; // 0 - право; 1 - начальная; 2 - лево
+        short[] footPixelPos = {0};
+        byte[] timer = {0}; //Первый таймер - нога, второй - атака
+        short[] swordRotation = {360};
+        byte[][] gamePlayWeaponAttack = {{0, 30, 40, 5, -15 ,-23, -15, -7, 25, 15, 0}, {0, -25, -50, -25, -20 ,0, 25, 50, 65, 30, 0}}; // 0 - X, 1 - Y
         Rotate imageFlip = new Rotate(180, Rotate.Y_AXIS);
         Rotate playerRotPlus = new Rotate(15, Rotate.Z_AXIS);
         Rotate playerRotMinus = new Rotate(-15, Rotate.Z_AXIS);
@@ -132,286 +136,309 @@ public class HelloApplication extends Application {
             protected void interpolate(double frac) {
                 // ЛОГИКА ИГРЫ ТУТ
                 timer[0] += 1;
-                if(timer[0] == Short.MAX_VALUE) timer[0] = 0;
-                for (int i = 0; i < 4; i++){
-                    if(pressed[0]){
-                        floorImage[i].setLayoutY(floorImage[i].getLayoutY() + 10);
+                if(timer[0] == Byte.MAX_VALUE) timer[0] = 0;
+                // Перемещение всего при движении
+                if(pressed[0]){
+                    floorCoords[1] += 10;
+                }
+                if(pressed[1]){
+                    floorCoords[0] += 10;
+                }
+                if(pressed[2]){
+                    floorCoords[1] -= 10;
+                }
+                if(pressed[3]){
+                    floorCoords[0] -= 10;
+                }
+                System.out.println(floorCoords[0] + " " + floorCoords[1]);
+                if(pressed[0] || pressed[1] || pressed[2] || pressed[3]){
+                    floorImage[0].setLayoutY(floorCoords[1]);
+                    floorImage[1].setLayoutY(floorCoords[1]);
+                    floorImage[2].setLayoutY(floorCoords[1] + 1490);
+                    floorImage[3].setLayoutY(floorCoords[1] + 1490);
+                    floorImage[0].setLayoutX(floorCoords[0]);
+                    floorImage[1].setLayoutX(floorCoords[0] + 2128);
+                    floorImage[2].setLayoutX(floorCoords[0]);
+                    floorImage[3].setLayoutX(floorCoords[0] + 2128);
+                }
+                // Проверка положения тела персонажа на наклон и поворот
+                if(pressed[1]){
+                    if (isReverted[0] && !pressed[3]) {
+                        isReverted[0] = false;
+                        playerBodyInGame.getTransforms().add(imageFlip);
+                        playerFootInGame.getTransforms().add(imageFlip);
+                        playerHeadInGame.getTransforms().add(imageFlip);
+                        playerWeaponInGame.getTransforms().add(imageFlip);
+                        playerHeadInGame.setLayoutX(hero.getHeadX());
+                        playerWeaponInGame.setLayoutX(hero.getWeaponX());
+                        playerBodyInGame.setLayoutX(708);
                     }
-                    if(pressed[1]){
-                        floorImage[i].setLayoutX(floorImage[i].getLayoutX() + 10);
-                        if (isReverted[0] && !pressed[3]) {
-                            isReverted[0] = false;
-                            playerBodyInGame.getTransforms().add(imageFlip);
-                            playerFootInGame.getTransforms().add(imageFlip);
-                            playerHeadInGame.getTransforms().add(imageFlip);
-                            playerWeaponInGame.getTransforms().add(imageFlip);
-                            playerHeadInGame.setLayoutX(gamePlayPlayerHead[0][selectedHero[0]]);
-                            playerWeaponInGame.setLayoutX(gamePlayPlayerWeapon[0][selectedHero[0]]);
-                            //playerFootInGame.setLayoutX(848);
-                            playerBodyInGame.setLayoutX(708);
-                        }
-                        if(!isRotated[0] && !pressed[3]){
-                            playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()+17);
-                            playerFootInGame.setLayoutY(playerFootInGame.getLayoutY()+8);
-                            playerBodyInGame.getTransforms().add(playerRotMinus);
-                            playerFootInGame.getTransforms().add(playerRotMinus);
-                            isRotated[0] = true;
-                        }
-                    }
-                    if(pressed[2]){
-                        floorImage[i].setLayoutY(floorImage[i].getLayoutY() - 10);
-                    }
-                    if(pressed[3]){
-                        floorImage[i].setLayoutX(floorImage[i].getLayoutX() - 10);
-                        if (!isReverted[0] && !pressed[1]) {
-                            isReverted[0] = true;
-                            playerBodyInGame.getTransforms().add(imageFlip);
-                            playerFootInGame.getTransforms().add(imageFlip);
-                            playerHeadInGame.getTransforms().add(imageFlip);
-                            playerWeaponInGame.getTransforms().add(imageFlip);
-                            playerHeadInGame.setLayoutX(gamePlayPlayerHeadReverted[selectedHero[0]]);
-                            playerWeaponInGame.setLayoutX(gamePlayPlayerWeaponReverted[selectedHero[0]]);
-                            //playerFootInGame.setLayoutX(898);
-                            playerBodyInGame.setLayoutX(841);
-                        }
-                        if(!isRotated[0] && !pressed[1]){
-                            playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()+17);
-                            playerFootInGame.setLayoutY(playerFootInGame.getLayoutY()+8);
-                            playerBodyInGame.getTransforms().add(playerRotMinus);
-                            playerFootInGame.getTransforms().add(playerRotMinus);
-                            isRotated[0] = true;
-                        }
+                    if(!isRotated[0] && !pressed[3]){
+                        playerBodyInGame.setLayoutY(hero.getBodyY()+17);
+                        playerFootInGame.setLayoutY(hero.getFootY()+8);
+                        playerBodyInGame.getTransforms().add(playerRotMinus);
+                        playerFootInGame.getTransforms().add(playerRotMinus);
+                        isRotated[0] = true;
                     }
                 }
+                if(pressed[3]){
+                    if (!isReverted[0] && !pressed[1]) {
+                        isReverted[0] = true;
+                        playerBodyInGame.getTransforms().add(imageFlip);
+                        playerFootInGame.getTransforms().add(imageFlip);
+                        playerHeadInGame.getTransforms().add(imageFlip);
+                        playerWeaponInGame.getTransforms().add(imageFlip);
+                        playerHeadInGame.setLayoutX(hero.getHeadXReverted());
+                        playerWeaponInGame.setLayoutX(hero.getWeaponXReverted());
+                        playerBodyInGame.setLayoutX(841);
+                    }
+                    if(!isRotated[0] && !pressed[1]){
+                        playerBodyInGame.setLayoutY(hero.getBodyY()+17);
+                        playerFootInGame.setLayoutY(hero.getFootY()+8);
+                        playerBodyInGame.getTransforms().add(playerRotMinus);
+                        playerFootInGame.getTransforms().add(playerRotMinus);
+                        isRotated[0] = true;
+                    }
+                }
+                if(pressed[1] && pressed[3] && isRotated[0]){
+                    isRotated[0] = false;
+                    playerBodyInGame.setLayoutY(hero.getBodyY());
+                    playerFootInGame.setLayoutY(hero.getFootY());
+                    playerBodyInGame.getTransforms().add(playerRotPlus);
+                    playerFootInGame.getTransforms().add(playerRotPlus);
+                }
+
                 // Контроль ноги
-                if(timer[0] % 4 == 0 && (pressed[0] || pressed[1] || pressed[2] || pressed[3])){
-                    footPos[0] = (footPos[0] + 1) % 3;
-                    if (isReverted[0]){
-                        if(isRotated[0]){
-                            playerFootInGame.setLayoutX(889);
+                if (timer[0] % 4 == 0){
+                    if(pressed[0] || pressed[2] || isRotated[0]){
+                        footPos[0] = (byte)((footPos[0] + 1) % 3);
+                        if (isReverted[0]){
+                            if(isRotated[0]){
+                                footPixelPos[0] = 889;
+                            } else {
+                                footPixelPos[0] = 898;
+                            }
                         } else {
-                            playerFootInGame.setLayoutX(898);
+                            if(isRotated[0]){
+                                footPixelPos[0] = 857;
+                            } else {
+                                footPixelPos[0] = 848;
+                            }
+                        }
+                        switch (footPos[0]) {
+                            case 0 -> footPixelPos[0] -= 5;
+                            case 2 -> footPixelPos[0] += 5;
                         }
                     } else {
-                        if(isRotated[0]){
-                            playerFootInGame.setLayoutX(857);
+                        if (isReverted[0]){
+                            footPixelPos[0] = 898;
                         } else {
-                            playerFootInGame.setLayoutX(848);
+                            footPixelPos[0] = 848;
                         }
                     }
-                    switch (footPos[0]){
-                        case 0:
-                            playerFootInGame.setLayoutX(playerFootInGame.getLayoutX()-5);
-                            break;
-                        case 2:
-                            playerFootInGame.setLayoutX(playerFootInGame.getLayoutX()+5);
-                            break;
+                    playerFootInGame.setLayoutX(footPixelPos[0]);
+                }
+                // Анимация меча
+                if(pressed[4] || swordRotation[0] != 360){
+                    if(swordRotation[0] == 360) swordRotation[0] = 0;
+                    if(timer[0] % 2 == 0){
+                        playerWeaponInGame.getTransforms().add(playerRotMinus);
+                        if (isReverted[0]){
+                            swordRotation[0] += 15;
+                            playerWeaponInGame.setLayoutX(hero.getWeaponXReverted() - gamePlayWeaponAttack[0][abs(swordRotation[0]) / 36]);
+                        } else {
+                            swordRotation[0] -= 15;
+                            playerWeaponInGame.setLayoutX(hero.getWeaponX() + gamePlayWeaponAttack[0][abs(swordRotation[0]) / 36]);
+                        }
+                        playerWeaponInGame.setLayoutY(hero.getWeaponY() + gamePlayWeaponAttack[1][abs(swordRotation[0]) / 36]);
                     }
+                    if(swordRotation[0] == -360) swordRotation[0] = 360;
                 }
                 // Создает бесконечность поля
-                if(floorImage[0].getLayoutY() <= -4870){
+                /*
+                if(floorCoords[1] >= -40){
+                    floorCoords[1] -= 1490;
+                }
+                if(floorCoords[0] >= -910){
+                    floorCoords[0] -= 2128;
+                }
+
+                if(floorCoords[1] >= -30){
                     for (int i = 0; i < 4; i++) {
-                        floorImage[i].setLayoutY(floorImage[i].getLayoutY() + 3000);
+                        floorCoords[1] -= 1490;
                     }
                 }
-                if(floorImage[0].getLayoutX() <= -6430){
+                if(floorImage[0].getLayoutX() >= -910){
                     for (int i = 0; i < 4; i++) {
-                        floorImage[i].setLayoutX(floorImage[i].getLayoutX() + 4264);
-                    }
-                }
-                if(floorImage[0].getLayoutY() >= -10){
-                    for (int i = 0; i < 4; i++) {
-                        floorImage[i].setLayoutY(floorImage[i].getLayoutY() - 3000);
-                    }
-                }
-                if(floorImage[0].getLayoutX() >= -1775){
-                    for (int i = 0; i < 4; i++) {
-                        floorImage[i].setLayoutX(floorImage[i].getLayoutX() - 4264);
+                        floorCoords[0] -= 2128;
                     }
                 }
 
-
+                 */
             }
         };
 
         maunScene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
-            switch (pane[0]){
-                case "mainMenu":
+            switch (pane[0]) {
+                case "mainMenu" -> {
                     for (int i = 0; i < 5; i++) mainMenuLabels[i].setTextFill(Color.rgb(98, 17, 17));
-                    switch (key.getCode()){
-                        case W:
-                            menuNavigator[0] = (menuNavigator[0] - 1) % 5;
-                            if(menuNavigator[0] < 0)
+                    switch (key.getCode()) {
+                        case W -> {
+                            menuNavigator[0] = (byte)((menuNavigator[0] - 1) % 5);
+                            if (menuNavigator[0] < 0)
                                 menuNavigator[0] = 4;
                             menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
-                            break;
-                        case S:
-                            menuNavigator[0] = (menuNavigator[0] + 1) % 5;
+                        }
+                        case S -> {
+                            menuNavigator[0] = (byte)((menuNavigator[0] + 1) % 5);
                             menuNavigatorImage.setLayoutY(menuNavigatorImageLocation[menuNavigator[0]]);
-                            break;
-                        case SPACE:
-                            switch (menuNavigator[0]){
-                                case 0:
+                        }
+                        case SPACE -> {
+                            switch (menuNavigator[0]) {
+                                case 0 -> {
                                     maunScene.setRoot(playMenu);
                                     pane[0] = "playMenu";
-                                    break;
-                                case 1:
+                                }
+                                case 1 -> {
                                     maunScene.setRoot(shopMenu); // TODO Магазин
                                     pane[0] = "shopMenu";
-                                    break;
-                                case 2:
+                                }
+                                case 2 -> {
                                     maunScene.setRoot(bestiaryMenu); // TODO Бестиарий
                                     pane[0] = "bestiaryMenu";
-                                    break;
-                                case 3:
+                                }
+                                case 3 -> {
                                     maunScene.setRoot(settingsMenu); // TODO Настройки
                                     pane[0] = "settingsMenu";
-                                    break;
-                                default:
-                                    Platform.exit();
-                                    break;
+                                }
+                                default -> Platform.exit();
                             }
                             menuNavigator[0] = 0;
-                            break;
+                        }
                     }
                     mainMenuLabels[menuNavigator[0]].setTextFill(Color.rgb(255, 255, 255));
-                    break;
-
-                case "playMenu":
-                    if(isCharacterSelected[0]) {
-                        switch (key.getCode()){
-                            case A:
-                                menuNavigator[0] = (menuNavigator[0] - 1) % 5;
+                }
+                case "playMenu" -> {
+                    if (hero.getSelectedHero() != -1) {
+                        switch (key.getCode()) {
+                            case A -> {
+                                menuNavigator[0] = (byte)((menuNavigator[0] - 1) % 5);
                                 if (menuNavigator[0] < 0)
                                     menuNavigator[0] = 4;
                                 playMenuSliderImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]);
-                                playMenuSliderNavigatorImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]-51);
-                                break;
-                            case D:
-                                menuNavigator[0] = (menuNavigator[0] + 1) % 5;
+                                playMenuSliderNavigatorImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]] - 51);
+                            }
+                            case D -> {
+                                menuNavigator[0] = (byte)((menuNavigator[0] + 1) % 5);
                                 playMenuSliderImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]);
-                                playMenuSliderNavigatorImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]]-51);
-                                break;
-                            case SPACE:
-                                playerHeadInGame.setLayoutX(gamePlayPlayerHead[0][selectedHero[0]]); playerHeadInGame.setLayoutY(gamePlayPlayerHead[1][selectedHero[0]]);
-                                playerWeaponInGame.setLayoutX(gamePlayPlayerWeapon[0][selectedHero[0]]); playerWeaponInGame.setLayoutY(gamePlayPlayerWeapon[1][selectedHero[0]]);
+                                playMenuSliderNavigatorImage.setLayoutX(playMenuSliderImageLocation[menuNavigator[0]] - 51);
+                            }
+                            case SPACE -> {
+                                playerHeadInGame.setLayoutX(hero.getHeadX());
+                                playerHeadInGame.setLayoutY(hero.getHeadY());
+                                playerWeaponInGame.setLayoutX(hero.getWeaponX());
+                                playerWeaponInGame.setLayoutY(hero.getWeaponY());
                                 try {
-                                    playerHeadInGame.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/head_%d.png", selectedHero[0]))));
-                                    playerWeaponInGame.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/weapon_%d.png", selectedHero[0]))));
-                                } catch (Exception e) {}
+                                    playerHeadInGame.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/head_%d.png", hero.getSelectedHero()))));
+                                    playerWeaponInGame.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/weapon_%d.png", hero.getSelectedHero()))));
+                                } catch (Exception ignored) {}
                                 maunScene.setRoot(gamePlay);
                                 pane[0] = "gamePlay";
                                 gameAnimation.play();
-                                break;
+                            }
                         }
                     } else {
                         switch (key.getCode()) {
-                            case W:
-                                menuNavigator[0] = (menuNavigator[0] - 1) % 4;
+                            case W -> {
+                                menuNavigator[0] = (byte)((menuNavigator[0] - 1) % 4);
                                 if (menuNavigator[0] < 0)
                                     menuNavigator[0] = 3;
                                 playMenuNavigatorImage.setLayoutY(playMenuNavigatorImageLocationY[menuNavigator[0]]);
-                                break;
-                            case S:
-                                menuNavigator[0] = (menuNavigator[0] + 1) % 4;
+                            }
+                            case S -> {
+                                menuNavigator[0] = (byte)((menuNavigator[0] + 1) % 4);
                                 playMenuNavigatorImage.setLayoutY(playMenuNavigatorImageLocationY[menuNavigator[0]]);
-                                break;
-                            case A:
-                                menuNavigator[1] = (menuNavigator[1] - 1) % 5;
+                            }
+                            case A -> {
+                                menuNavigator[1] = (byte)((menuNavigator[1] - 1) % 5);
                                 if (menuNavigator[1] < 0)
                                     menuNavigator[1] = 4;
                                 playMenuNavigatorImage.setLayoutX(playMenuNavigatorImageLocationX[menuNavigator[1]]);
-                                break;
-                            case D:
-                                menuNavigator[1] = (menuNavigator[1] + 1) % 5;
+                            }
+                            case D -> {
+                                menuNavigator[1] = (byte)((menuNavigator[1] + 1) % 5);
                                 playMenuNavigatorImage.setLayoutX(playMenuNavigatorImageLocationX[menuNavigator[1]]);
-                                break;
-                            case SPACE:
+                            }
+                            case SPACE -> {
                                 if (unlockedHeroes[menuNavigator[0]][menuNavigator[1]]) {
-                                    isCharacterSelected[0] = true;
+                                    hero.setSelectedHero((byte)(menuNavigator[0] * 5 + menuNavigator[1]));
                                     playMenuNavigatorImage.setOpacity(0.0);
                                     playMenuSliderNavigatorImage.setOpacity(1.0);
                                     // Todo Анимация слайдера
                                 }
-                                break;
+                            }
                         }
                         if (unlockedHeroes[menuNavigator[0]][menuNavigator[1]]) {
-                            selectedHero[0] = menuNavigator[0] * 5 + menuNavigator[1];
-                            playerHead.setLayoutX(playMenuPlayerHead[0][selectedHero[0]]); playerHead.setLayoutY(playMenuPlayerHead[1][selectedHero[0]]);
-                            playerWeapon.setLayoutX(playMenuPlayerWeapon[0][selectedHero[0]]); playerWeapon.setLayoutY(playMenuPlayerWeapon[1][selectedHero[0]]);
+                            playerHead.setLayoutX(playMenuPlayerHead[0][(byte)(menuNavigator[0] * 5 + menuNavigator[1])]);
+                            playerHead.setLayoutY(playMenuPlayerHead[1][(byte)(menuNavigator[0] * 5 + menuNavigator[1])]);
+                            playerWeapon.setLayoutX(playMenuPlayerWeapon[0][(byte)(menuNavigator[0] * 5 + menuNavigator[1])]);
+                            playerWeapon.setLayoutY(playMenuPlayerWeapon[1][(byte)(menuNavigator[0] * 5 + menuNavigator[1])]);
                             try {
-                                playerHead.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/head_%d.png", selectedHero[0]))));
-                                playerWeapon.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/weapon_%d.png", selectedHero[0]))));
-                            } catch (Exception e) {}
+                                playerHead.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/head_%d.png", (menuNavigator[0] * 5 + menuNavigator[1])))));
+                                playerWeapon.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/weapon_%d.png", (menuNavigator[0] * 5 + menuNavigator[1])))));
+                            } catch (Exception ignored) {}
                         }
                     }
-                    break;
-
-                case "gamePlay":
+                }
+                case "gamePlay" -> {
                     switch (key.getCode()) {
-                        case W:
-                            pressed[0] = true;
-                            break;
-                        case A:
-                            pressed[1] = true;
-                            break;
-                        case S:
-                            pressed[2] = true;
-                            break;
-                        case D:
-                            pressed[3] = true;
-                            break;
-                        case SPACE:
-
-                            break;
+                        case W -> pressed[0] = true;
+                        case A -> pressed[1] = true;
+                        case S -> pressed[2] = true;
+                        case D -> pressed[3] = true;
+                        case SPACE -> pressed[4] = true;
                     }
-                    break;
+                }
             }
         });
         maunScene.addEventHandler(KeyEvent.KEY_RELEASED, (key) -> {
-            if (pane[0] == "gamePlay"){
+            if (Objects.equals(pane[0], "gamePlay")){
                 switch (key.getCode()) {
-                    case W:
-                        pressed[0] = false;
-                        break;
-                    case A:
+                    case W -> pressed[0] = false;
+                    case A -> {
                         pressed[1] = false;
-                        if(!pressed[3]){
-                            playerHeadInGame.setLayoutX(gamePlayPlayerHead[0][selectedHero[0]]);
-                            playerWeaponInGame.setLayoutX(gamePlayPlayerWeapon[0][selectedHero[0]]);
+                        if (!pressed[3]) {
+                            playerHeadInGame.setLayoutX(hero.getHeadX());
+                            playerWeaponInGame.setLayoutX(hero.getWeaponX());
                             playerFootInGame.setLayoutX(848);
                             playerBodyInGame.setLayoutX(708);
                         }
-                        if(isRotated[0]){
+                        if (isRotated[0]) {
                             isRotated[0] = false;
-                            playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()-17);
-                            playerFootInGame.setLayoutY(playerFootInGame.getLayoutY()-8);
+                            playerBodyInGame.setLayoutY(hero.getBodyY());
+                            playerFootInGame.setLayoutY(hero.getFootY());
                             playerBodyInGame.getTransforms().add(playerRotPlus);
                             playerFootInGame.getTransforms().add(playerRotPlus);
                         }
-                        break;
-                    case S:
-                        pressed[2] = false;
-                        break;
-                    case D:
+                    }
+                    case S -> pressed[2] = false;
+                    case D -> {
                         pressed[3] = false;
-                        if(!pressed[1]){
-                            playerHeadInGame.setLayoutX(gamePlayPlayerHeadReverted[selectedHero[0]]);
-                            playerWeaponInGame.setLayoutX(gamePlayPlayerWeaponReverted[selectedHero[0]]);
+                        if (!pressed[1]) {
+                            playerHeadInGame.setLayoutX(hero.getHeadXReverted());
+                            playerWeaponInGame.setLayoutX(hero.getWeaponXReverted());
                             playerFootInGame.setLayoutX(898);
                             playerBodyInGame.setLayoutX(841);
                         }
-                        if(isRotated[0]){
+                        if (isRotated[0]) {
                             isRotated[0] = false;
-                            playerBodyInGame.setLayoutY(playerBodyInGame.getLayoutY()-17);
-                            playerFootInGame.setLayoutY(playerFootInGame.getLayoutY()-8);
+                            playerBodyInGame.setLayoutY(hero.getBodyY());
+                            playerFootInGame.setLayoutY(hero.getFootY());
                             playerBodyInGame.getTransforms().add(playerRotPlus);
                             playerFootInGame.getTransforms().add(playerRotPlus);
                         }
-                        break;
-                    case SPACE:
-
-                        break;
+                    }
+                    case SPACE -> pressed[4] = false;
                 }
             }
         });
