@@ -37,7 +37,9 @@ public class HelloApplication extends Application {
 
         // Все возможные меню
         Pane mainMenu = new Pane(); mainMenu.getTransforms().add(scale);
+        mainMenu.setCache(true);
         Pane playMenu = new Pane(); playMenu.getTransforms().add(scale);
+        playMenu.setCache(true);
         Pane gamePlay = new Pane(); gamePlay.getTransforms().add(scale);
         Pane shopMenu = new Pane(); shopMenu.getTransforms().add(scale);
         Pane settingsMenu = new Pane(); settingsMenu.getTransforms().add(scale);
@@ -87,7 +89,7 @@ public class HelloApplication extends Application {
         playerWeaponInGame.setScaleX(0.3); playerWeaponInGame.setScaleY(0.3); playerWeaponInGame.setLayoutX(740); playerWeaponInGame.setLayoutY(410);
         ImageView[] floorImage = new ImageView[4];
         for (int i = 0; i < 4; i++){
-            floorImage[i] = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/floor.png")));
+            floorImage[i] = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/floor.png"), 800, 0, true, true));
         }
         int[] floorCoords = {-1000, -200}; // X и Y
         floorImage[0].setLayoutY(floorCoords[1]);
@@ -175,6 +177,9 @@ public class HelloApplication extends Application {
                 if(timer[0] == Byte.MAX_VALUE) timer[0] = 0;
                 // Перемещение всего при движении
                 killerLabel.setText(Integer.toString(killerCount[0]));
+                for(int i = 0; i < 8; i++){
+                    enemy[i].pursuit(hero.getBodyY(), (short) playerBodyInGame.getLayoutX());
+                }
                 if(pressed[0]){
                     floorCoords[1] += 10;
                     for (int i = 0; i < 8; i++) {
@@ -337,6 +342,7 @@ public class HelloApplication extends Application {
                             switch (menuNavigator[0]) {
                                 case 0 -> {
                                     maunScene.setRoot(playMenu);
+                                    mainMenu.getChildren().removeAll();
                                     pane[0] = "playMenu";
                                 }
                                 case 1 -> {
@@ -383,6 +389,7 @@ public class HelloApplication extends Application {
                                     playerWeaponInGame.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/weapon_%d.png", hero.getSelectedHero()))));
                                 } catch (Exception ignored) {}
                                 maunScene.setRoot(gamePlay);
+                                playMenu.getChildren().removeAll();
                                 pane[0] = "gamePlay";
                                 gameAnimation.play();
                             }
