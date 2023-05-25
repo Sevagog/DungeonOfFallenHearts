@@ -17,6 +17,10 @@ public class Enemy {
     private boolean isflipped = false;
     private Random random = new Random();
 
+    private int length = 35;
+    private int height = 60;
+
+
     public Enemy(int posX, int posY) throws FileNotFoundException {
         this.posX = posX;
         this.posY = posY;
@@ -26,6 +30,32 @@ public class Enemy {
         head.setScaleX(0.3); head.setScaleY(0.3); head.setLayoutX(posX+10); head.setLayoutY(posY-20);
         foot = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/enemy_foot.png")));
         foot.setScaleX(0.3); foot.setScaleY(0.3); foot.setLayoutX(posX+10); foot.setLayoutY(posY+30);
+    }
+
+    public boolean intersect(short hHeadY, short hHeadX, short hFootY, short hFootX){
+        if(((foot.getLayoutY() + 35) > hHeadY) && ((foot.getLayoutY() + 35) <= hHeadY + height)){
+            if(isflipped){
+                if(((body.getLayoutX() + 35) >= hHeadX) && ((body.getLayoutX() + 35) <= (hHeadX + length))){
+                    return true;
+                }
+            }else{
+                if(((body.getLayoutX() - 35) >= (hHeadX + length)) && ((body.getLayoutX() - 35) <= (hHeadX))){
+                    return true;
+                }
+            }
+
+        } else if ((head.getLayoutY() <= (hHeadY + height)) && (head.getLayoutY() >= hHeadY) ) {
+            if(isflipped){
+                if(((body.getLayoutX() + 35) >= hHeadX) && ((body.getLayoutX() + 35) <= (hHeadX + length))){
+                    return true;
+                }
+            }else{
+                if(((body.getLayoutX() - 35) >= (hHeadX + length)) && ((body.getLayoutX() - 35) <= (hHeadX))){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void setPosX(int posX) {
@@ -56,9 +86,14 @@ public class Enemy {
 
     public void moveX(int moveX) {
         this.posX += moveX;
+        if(isflipped){
+            head.setLayoutX(posX+30);
+            foot.setLayoutX(posX+40);
+        }else{
+            head.setLayoutX(posX+70);
+            foot.setLayoutX(posX+133);
+        }
         body.setLayoutX(posX);
-        head.setLayoutX(posX+70);
-        foot.setLayoutX(posX+133);
     }
     public void moveY(int moveY) {
         this.posY += moveY;
@@ -69,7 +104,7 @@ public class Enemy {
 
     public void pursuit(short hBodyY, short hBodyX){
         if(body.getLayoutY() <= hBodyY){
-            if(body.getLayoutX() >= hBodyX){
+            if(body.getLayoutX() >= hBodyX + 10){
                 //возврат в исходное его положение
                 if(isflipped){
                     head.getTransforms().add(imflip);
@@ -79,7 +114,7 @@ public class Enemy {
                 }
                 moveX(-random.nextInt(4));
             }else{
-                // отзеркаливание противника
+                // отзеркаливание противника - направление движения вправо
                 if(!isflipped){
                     head.getTransforms().add(imflip);
                     body.getTransforms().add(imflip);
@@ -91,7 +126,7 @@ public class Enemy {
             moveY(random.nextInt(4));
 
         } else if(body.getLayoutY() >= hBodyY){
-            if(body.getLayoutX() >= hBodyX){
+            if(body.getLayoutX() >= hBodyX + 10){
                 //возрат в исходное положение
                 if(isflipped){
                     head.getTransforms().add(imflip);

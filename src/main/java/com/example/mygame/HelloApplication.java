@@ -45,7 +45,13 @@ public class HelloApplication extends Application {
         Pane settingsMenu = new Pane(); settingsMenu.getTransforms().add(scale);
         Pane bestiaryMenu = new Pane(); bestiaryMenu.getTransforms().add(scale);
         Scene maunScene = new Scene(mainMenu, 1920, 1080);
+        Pane endGame = new Pane();
         Font mainFont = Font.loadFont("file:src/main/java/com/example/mygame/main_font.ttf", 75);
+
+        //Экран поражения
+        //ImageView engBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/back.png"), 2000, 2000, true, true)); engBackgroundImage.setLayoutX(-40);
+        //Label deathInfo = new Label("Смерть"); deathInfo.setFont(mainFont); deathInfo.setTextFill(Color.rgb(98, 17, 17)); deathInfo.setLayoutX(860); deathInfo.setLayoutY(350);
+        //endGame.getChildren().addAll(engBackgroundImage, deathInfo);
 
         // Для главного меню
         ImageView menuBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_background.png"))); menuBackgroundImage.setLayoutX(-40);
@@ -179,6 +185,9 @@ public class HelloApplication extends Application {
                 killerLabel.setText(Integer.toString(killerCount[0]));
                 for(int i = 0; i < 8; i++){
                     enemy[i].pursuit(hero.getBodyY(), (short) playerBodyInGame.getLayoutX());
+                    if(enemy[i].intersect(hero.getHeadY(), hero.getHeadX(), (short)playerFootInGame.getLayoutX(), hero.getFootY())){
+                        maunScene.setRoot(endGame);
+                    }
                 }
                 if(pressed[0]){
                     floorCoords[1] += 10;
