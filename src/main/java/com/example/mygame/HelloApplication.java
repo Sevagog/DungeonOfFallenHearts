@@ -37,13 +37,21 @@ public class HelloApplication extends Application {
 
         // Все возможные меню
         Pane mainMenu = new Pane(); mainMenu.getTransforms().add(scale);
+        mainMenu.setCache(true);
         Pane playMenu = new Pane(); playMenu.getTransforms().add(scale);
+        playMenu.setCache(true);
         Pane gamePlay = new Pane(); gamePlay.getTransforms().add(scale);
         Pane shopMenu = new Pane(); shopMenu.getTransforms().add(scale);
         Pane settingsMenu = new Pane(); settingsMenu.getTransforms().add(scale);
         Pane bestiaryMenu = new Pane(); bestiaryMenu.getTransforms().add(scale);
         Scene maunScene = new Scene(mainMenu, 1920, 1080);
+        Pane endGame = new Pane();
         Font mainFont = Font.loadFont("file:src/main/java/com/example/mygame/main_font.ttf", 75);
+
+        //Экран поражения
+        ImageView engBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/black.png"), 2000, 2000, true, true)); engBackgroundImage.setLayoutX(-40);
+        Label deathInfo = new Label("Смерть"); deathInfo.setFont(mainFont); deathInfo.setTextFill(Color.rgb(98, 17, 17)); deathInfo.setLayoutX(625); deathInfo.setLayoutY(370);
+        endGame.getChildren().addAll(engBackgroundImage, deathInfo);
 
         // Для главного меню
         ImageView menuBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_background.png"))); menuBackgroundImage.setLayoutX(-40);
@@ -175,6 +183,12 @@ public class HelloApplication extends Application {
                 if(timer[0] == Byte.MAX_VALUE) timer[0] = 0;
                 // Перемещение всего при движении
                 killerLabel.setText(Integer.toString(killerCount[0]));
+                for(int i = 0; i < 8; i++){
+                    enemy[i].pursuit(hero.getBodyY(), (short) playerBodyInGame.getLayoutX());
+                    if(enemy[i].intersect()){
+                        maunScene.setRoot(endGame);
+                    }
+                }
                 if(pressed[0]){
                     floorCoords[1] += 10;
                     for (int i = 0; i < 8; i++) {
@@ -337,6 +351,7 @@ public class HelloApplication extends Application {
                             switch (menuNavigator[0]) {
                                 case 0 -> {
                                     maunScene.setRoot(playMenu);
+                                    mainMenu.getChildren().removeAll();
                                     pane[0] = "playMenu";
                                 }
                                 case 1 -> {
@@ -383,6 +398,7 @@ public class HelloApplication extends Application {
                                     playerWeaponInGame.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/weapon_%d.png", hero.getSelectedHero()))));
                                 } catch (Exception ignored) {}
                                 maunScene.setRoot(gamePlay);
+                                playMenu.getChildren().removeAll();
                                 pane[0] = "gamePlay";
                                 gameAnimation.play();
                             }
