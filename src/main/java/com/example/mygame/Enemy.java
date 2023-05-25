@@ -127,4 +127,8 @@ public class Enemy {
             moveY(-(random.nextInt(4) + 2 + 2*difficulty));
         }
     }
+
+    public void setDifficulty(byte difficulty) {
+        this.difficulty = difficulty;
+    }
 }

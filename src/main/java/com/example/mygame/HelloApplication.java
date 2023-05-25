@@ -4,7 +4,6 @@ import javafx.animation.Animation;
 import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.CacheHint;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -131,7 +130,6 @@ public class HelloApplication extends Application {
         ImageView killBar = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/kill_bar.png"))); killBar.setLayoutX(1530); killBar.setLayoutY(20);
         Label killerLabel = new Label("0"); killerLabel.setLayoutY(13); killerLabel.setLayoutX(1623); killerLabel.setFont(mainFont); killerLabel.setTextFill(Color.rgb(255, 255, 255));
         gamePlay.getChildren().addAll(playerWeaponInGame, playerFootInGame, playerBodyInGame, playerHeadInGame, darkImage, healthBar, killBar, killerLabel);
-        gamePlay.setCache(true); gamePlay.setCacheHint(CacheHint.SPEED);
 
         stage.setTitle("Dungeon Of Fallen Hearts");
         stage.setScene(maunScene);
@@ -294,6 +292,7 @@ public class HelloApplication extends Application {
                         for (int i = 0; i < 8; i++) {
                             if(enemy[i].posX > hero.getWeaponX() + 120 && enemy[i].posX < hero.getWeaponX() + 170 && enemy[i].posY > hero.getWeaponY() - 200 && enemy[i].posY < hero.getWeaponY() + 200){
                                 killerCount[0] += 1;
+                                enemy[i].setDifficulty(difficulty[0]);
                                 switch ((int)(random() * 8)){
                                     case 0 -> {
                                         enemy[i].setPosX((int) (-600 + random() * 500));
@@ -326,6 +325,7 @@ public class HelloApplication extends Application {
                         for (int i = 0; i < 8; i++) {
                             if(enemy[i].posX > hero.getWeaponX() - 190 && enemy[i].posX < hero.getWeaponX() - 10 && enemy[i].posY > hero.getWeaponY() - 200 && enemy[i].posY < hero.getWeaponY() + 200){
                                 killerCount[0] += 1;
+                                enemy[i].setDifficulty(difficulty[0]);
                                 switch ((int)(random() * 8)){
                                     case 0 -> {
                                         enemy[i].setPosX((int) (-600 + random() * 500));
@@ -493,34 +493,6 @@ public class HelloApplication extends Application {
                         playMenuNavigatorImage.setOpacity(1.0);
                         playMenuSliderNavigatorImage.setOpacity(0.0);
                         pane[0] = "playMenu";
-                        for (int i = 0; i < 8; i++){
-                            switch ((int)(random() * 8)){
-                                case 0 -> {
-                                    enemy[i].setPosX((int) (-600 + random() * 500));
-                                    enemy[i].setPosY((int) (-600 + random() * 500));}
-                                case 1 -> {
-                                    enemy[i].setPosX((int) (random() * 1900));
-                                    enemy[i].setPosY((int) (-600 + random() * 500));}
-                                case 2 -> {
-                                    enemy[i].setPosX((int) (1900 + random() * 500));
-                                    enemy[i].setPosY((int) (-600 + random() * 500));}
-                                case 3 -> {
-                                    enemy[i].setPosX((int) (1920 + random() * 500));
-                                    enemy[i].setPosY((int) (random() * 1080));}
-                                case 4 -> {
-                                    enemy[i].setPosX((int) (1920 + random() * 500));
-                                    enemy[i].setPosY((int) (1080 + random() * 500));}
-                                case 5 -> {
-                                    enemy[i].setPosX((int) (random() * 1900));
-                                    enemy[i].setPosY((int) (1080 + random() * 500));}
-                                case 6 -> {
-                                    enemy[i].setPosX((int) (-600 + (random() * 500)));
-                                    enemy[i].setPosY((int) (1080 + (random() * 500)));}
-                                case 7 -> {
-                                    enemy[i].setPosX((int) (-600 + (random() * 500)));
-                                    enemy[i].setPosY((int) (random() * 1080));}
-                            }
-                        }
                         maunScene.setRoot(playMenu);
                     }
                 }
