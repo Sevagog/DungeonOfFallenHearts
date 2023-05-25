@@ -95,7 +95,7 @@ public class HelloApplication extends Application {
         playerWeaponInGame.setScaleX(0.3); playerWeaponInGame.setScaleY(0.3); playerWeaponInGame.setLayoutX(740); playerWeaponInGame.setLayoutY(410);
         ImageView[] floorImage = new ImageView[4];
         for (int i = 0; i < 4; i++){
-            floorImage[i] = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/floor.png"), 800, 0, true, true));
+            floorImage[i] = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/floor.png")));
         }
         int[] floorCoords = {-1000, -200}; // X и Y
         floorImage[0].setLayoutY(floorCoords[1]);
