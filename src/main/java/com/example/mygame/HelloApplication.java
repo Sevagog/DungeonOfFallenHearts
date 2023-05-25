@@ -94,7 +94,8 @@ public class HelloApplication extends Application {
         ImageView playerWeaponInGame = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/weapon_0.png")));
         playerWeaponInGame.setScaleX(0.3); playerWeaponInGame.setScaleY(0.3); playerWeaponInGame.setLayoutX(740); playerWeaponInGame.setLayoutY(410);
         gamePlay.getChildren().add(blackBackground);
-        Enemy[] enemy = {new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0)};
+        byte[] difficulty = {0};
+        Enemy[] enemy = {new Enemy(0, 0, difficulty[0]), new Enemy(0, 0, difficulty[0]), new Enemy(0, 0, difficulty[0]), new Enemy(0, 0, difficulty[0]), new Enemy(0, 0, difficulty[0]), new Enemy(0, 0, difficulty[0]), new Enemy(0, 0, difficulty[0]), new Enemy(0, 0, difficulty[0])};
         for (int i = 0; i < 8; i++){
             switch ((int)(random() * 8)){
                 case 0 -> {
@@ -353,6 +354,7 @@ public class HelloApplication extends Application {
                                 playerHeadInGame.setLayoutY(hero.getHeadY());
                                 playerWeaponInGame.setLayoutX(hero.getWeaponX());
                                 playerWeaponInGame.setLayoutY(hero.getWeaponY());
+                                difficulty[0] = menuNavigator[0];
                                 try {
                                     playerHeadInGame.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/head_%d.png", hero.getSelectedHero()))));
                                     playerWeaponInGame.setImage(new Image(new FileInputStream(String.format("src/main/java/com/example/mygame/weapon_%d.png", hero.getSelectedHero()))));
