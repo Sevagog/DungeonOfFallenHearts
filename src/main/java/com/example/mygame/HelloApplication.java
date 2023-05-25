@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -175,6 +176,7 @@ public class HelloApplication extends Application {
                     enemy[i].pursuit();
                     if(enemy[i].intersect()){
                         maunScene.setRoot(endGame);
+                        pane[0] = "endGame";
                     }
                 }
                 if(pressed[0]){
@@ -287,6 +289,71 @@ public class HelloApplication extends Application {
                             playerWeaponInGame.setLayoutX(hero.getWeaponX() + gamePlayWeaponAttack[0][abs(swordRotation[0]) / 36]);
                         }
                         playerWeaponInGame.setLayoutY(hero.getWeaponY() + gamePlayWeaponAttack[1][abs(swordRotation[0]) / 36]);
+                    }
+                    if (isReverted[0]){
+                        for (int i = 0; i < 8; i++) {
+                            if(enemy[i].posX > hero.getWeaponX() + 120 && enemy[i].posX < hero.getWeaponX() + 170 && enemy[i].posY > hero.getWeaponY() - 200 && enemy[i].posY < hero.getWeaponY() + 200){
+                                killerCount[0] += 1;
+                                switch ((int)(random() * 8)){
+                                    case 0 -> {
+                                        enemy[i].setPosX((int) (-600 + random() * 500));
+                                        enemy[i].setPosY((int) (-600 + random() * 500));}
+                                    case 1 -> {
+                                        enemy[i].setPosX((int) (random() * 1900));
+                                        enemy[i].setPosY((int) (-600 + random() * 500));}
+                                    case 2 -> {
+                                        enemy[i].setPosX((int) (1900 + random() * 500));
+                                        enemy[i].setPosY((int) (-600 + random() * 500));}
+                                    case 3 -> {
+                                        enemy[i].setPosX((int) (1920 + random() * 500));
+                                        enemy[i].setPosY((int) (random() * 1080));}
+                                    case 4 -> {
+                                        enemy[i].setPosX((int) (1920 + random() * 500));
+                                        enemy[i].setPosY((int) (1080 + random() * 500));}
+                                    case 5 -> {
+                                        enemy[i].setPosX((int) (random() * 1900));
+                                        enemy[i].setPosY((int) (1080 + random() * 500));}
+                                    case 6 -> {
+                                        enemy[i].setPosX((int) (-600 + (random() * 500)));
+                                        enemy[i].setPosY((int) (1080 + (random() * 500)));}
+                                    case 7 -> {
+                                        enemy[i].setPosX((int) (-600 + (random() * 500)));
+                                        enemy[i].setPosY((int) (random() * 1080));}
+                                }
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < 8; i++) {
+                            if(enemy[i].posX > hero.getWeaponX() - 190 && enemy[i].posX < hero.getWeaponX() - 10 && enemy[i].posY > hero.getWeaponY() - 200 && enemy[i].posY < hero.getWeaponY() + 200){
+                                killerCount[0] += 1;
+                                switch ((int)(random() * 8)){
+                                    case 0 -> {
+                                        enemy[i].setPosX((int) (-600 + random() * 500));
+                                        enemy[i].setPosY((int) (-600 + random() * 500));}
+                                    case 1 -> {
+                                        enemy[i].setPosX((int) (random() * 1900));
+                                        enemy[i].setPosY((int) (-600 + random() * 500));}
+                                    case 2 -> {
+                                        enemy[i].setPosX((int) (1900 + random() * 500));
+                                        enemy[i].setPosY((int) (-600 + random() * 500));}
+                                    case 3 -> {
+                                        enemy[i].setPosX((int) (1920 + random() * 500));
+                                        enemy[i].setPosY((int) (random() * 1080));}
+                                    case 4 -> {
+                                        enemy[i].setPosX((int) (1920 + random() * 500));
+                                        enemy[i].setPosY((int) (1080 + random() * 500));}
+                                    case 5 -> {
+                                        enemy[i].setPosX((int) (random() * 1900));
+                                        enemy[i].setPosY((int) (1080 + random() * 500));}
+                                    case 6 -> {
+                                        enemy[i].setPosX((int) (-600 + (random() * 500)));
+                                        enemy[i].setPosY((int) (1080 + (random() * 500)));}
+                                    case 7 -> {
+                                        enemy[i].setPosX((int) (-600 + (random() * 500)));
+                                        enemy[i].setPosY((int) (random() * 1080));}
+                                }
+                            }
+                        }
                     }
                     if(swordRotation[0] == -360) swordRotation[0] = 360;
                 }
@@ -415,6 +482,46 @@ public class HelloApplication extends Application {
                         case S -> pressed[2] = true;
                         case D -> pressed[3] = true;
                         case SPACE -> pressed[4] = true;
+                    }
+                }
+                case "endGame" -> {
+                    if(key.getCode() == KeyCode.SPACE){
+                        System.out.println("Z nen");
+                        menuNavigator[0] = 0;
+                        menuNavigator[1] = 0;
+                        hero.setSelectedHero((byte) -1);
+                        playMenuNavigatorImage.setOpacity(1.0);
+                        playMenuSliderNavigatorImage.setOpacity(0.0);
+                        pane[0] = "playMenu";
+                        for (int i = 0; i < 8; i++){
+                            switch ((int)(random() * 8)){
+                                case 0 -> {
+                                    enemy[i].setPosX((int) (-600 + random() * 500));
+                                    enemy[i].setPosY((int) (-600 + random() * 500));}
+                                case 1 -> {
+                                    enemy[i].setPosX((int) (random() * 1900));
+                                    enemy[i].setPosY((int) (-600 + random() * 500));}
+                                case 2 -> {
+                                    enemy[i].setPosX((int) (1900 + random() * 500));
+                                    enemy[i].setPosY((int) (-600 + random() * 500));}
+                                case 3 -> {
+                                    enemy[i].setPosX((int) (1920 + random() * 500));
+                                    enemy[i].setPosY((int) (random() * 1080));}
+                                case 4 -> {
+                                    enemy[i].setPosX((int) (1920 + random() * 500));
+                                    enemy[i].setPosY((int) (1080 + random() * 500));}
+                                case 5 -> {
+                                    enemy[i].setPosX((int) (random() * 1900));
+                                    enemy[i].setPosY((int) (1080 + random() * 500));}
+                                case 6 -> {
+                                    enemy[i].setPosX((int) (-600 + (random() * 500)));
+                                    enemy[i].setPosY((int) (1080 + (random() * 500)));}
+                                case 7 -> {
+                                    enemy[i].setPosX((int) (-600 + (random() * 500)));
+                                    enemy[i].setPosY((int) (random() * 1080));}
+                            }
+                        }
+                        maunScene.setRoot(playMenu);
                     }
                 }
             }

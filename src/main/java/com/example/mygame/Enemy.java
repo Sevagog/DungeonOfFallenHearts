@@ -92,7 +92,7 @@ public class Enemy {
                     foot.getTransforms().add(imFlip);
                     isFlipped=false;
                 }
-                moveX(-(random.nextInt(4) + 1 + difficulty));
+                moveX(-(random.nextInt(4) + 2 + 2*difficulty));
             }else if (posX <= 700){
                 // отзеркаливание противника - направление движения вправо
                 if(!isFlipped){
@@ -101,9 +101,9 @@ public class Enemy {
                     foot.getTransforms().add(imFlip);
                     isFlipped =true;
                 }
-                moveX(random.nextInt(4) + 1 + difficulty);
+                moveX(random.nextInt(4) + 2 + 2*difficulty);
             }
-            moveY(random.nextInt(4) + 1 + difficulty);
+            moveY(random.nextInt(4) + 2 + 2*difficulty);
         } else {
             if(posX >= 760){
                 //возрат в исходное положение
@@ -113,7 +113,7 @@ public class Enemy {
                     foot.getTransforms().add(imFlip);
                     isFlipped=false;
                 }
-                moveX(-(random.nextInt(4) + 1 + difficulty));
+                moveX(-(random.nextInt(4) + 2 + 2*difficulty));
             } else if (posX <= 710){
                 //отзеркаливание противника
                 if(!isFlipped){
@@ -122,9 +122,9 @@ public class Enemy {
                     foot.getTransforms().add(imFlip);
                     isFlipped =true;
                 }
-                moveX(random.nextInt(4) + 1 + difficulty);
+                moveX(random.nextInt(4) + 2 + 2*difficulty);
             }
-            moveY(-(random.nextInt(4) + 1 + difficulty));
+            moveY(-(random.nextInt(4) + 2 + 2*difficulty));
         }
     }
 }

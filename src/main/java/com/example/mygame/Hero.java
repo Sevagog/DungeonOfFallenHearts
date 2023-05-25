@@ -9,12 +9,14 @@ public class Hero {
 
     public void setSelectedHero(byte selectedHero) {
         this.selectedHero = selectedHero;
-        getWeaponX = weaponX[selectedHero];
-        getWeaponXReverted = weaponXReverted[selectedHero];
-        getWeaponY = weaponY[selectedHero];
-        getHeadX = headX[selectedHero];
-        getHeadXReverted = headXReverted[selectedHero];
-        getHeadY = headY[selectedHero];
+        if(selectedHero != -1){
+            getWeaponX = weaponX[selectedHero];
+            getWeaponXReverted = weaponXReverted[selectedHero];
+            getWeaponY = weaponY[selectedHero];
+            getHeadX = headX[selectedHero];
+            getHeadXReverted = headXReverted[selectedHero];
+            getHeadY = headY[selectedHero];
+        }
     }
 
     public byte getSelectedHero() {
