@@ -13,12 +13,9 @@ public class Enemy {
     private ImageView head;
     private ImageView body;
     private ImageView foot;
-    private Rotate imflip = new Rotate(180, Rotate.Y_AXIS);
-    private boolean isflipped = false;
+    private Rotate imFlip = new Rotate(180, Rotate.Y_AXIS);
+    private boolean isFlipped = false;
     private Random random = new Random();
-
-    private int length = 35;
-    private int height = 60;
 
 
     public Enemy(int posX, int posY) throws FileNotFoundException {
@@ -67,7 +64,7 @@ public class Enemy {
 
     public void moveX(int moveX) {
         this.posX += moveX;
-        if(isflipped){
+        if(isFlipped){
             head.setLayoutX(posX+130);
             foot.setLayoutX(posX+140);
             body.setLayoutX(posX + 100);
@@ -85,46 +82,45 @@ public class Enemy {
         foot.setLayoutY(posY+95);
     }
 
-    public void pursuit(short hBodyY, short hBodyX){
-        if(posY <= hBodyY){
-            if(posX >= hBodyX){
+    public void pursuit(){
+        if(posY <= 540){
+            if(posX >= 750){
                 //возврат в исходное его положение
-                if(isflipped){
-                    head.getTransforms().add(imflip);
-                    body.getTransforms().add(imflip);
-                    foot.getTransforms().add(imflip);
-                    isflipped=false;
+                if(isFlipped){
+                    head.getTransforms().add(imFlip);
+                    body.getTransforms().add(imFlip);
+                    foot.getTransforms().add(imFlip);
+                    isFlipped=false;
                 }
                 moveX(-(random.nextInt(4) + 2));
-            }else if((posX + 10) <= hBodyX){
+            }else if (posX <= 700){
                 // отзеркаливание противника - направление движения вправо
-                if(!isflipped){
-                    head.getTransforms().add(imflip);
-                    body.getTransforms().add(imflip);
-                    foot.getTransforms().add(imflip);
-                    isflipped =true;
+                if(!isFlipped){
+                    head.getTransforms().add(imFlip);
+                    body.getTransforms().add(imFlip);
+                    foot.getTransforms().add(imFlip);
+                    isFlipped =true;
                 }
                 moveX(random.nextInt(4) + 2);
             }
             moveY(random.nextInt(4) + 2);
-
-        } else if(posY >= hBodyY){
-            if(posX >= hBodyX + 10){
+        } else {
+            if(posX >= 760){
                 //возрат в исходное положение
-                if(isflipped){
-                    head.getTransforms().add(imflip);
-                    body.getTransforms().add(imflip);
-                    foot.getTransforms().add(imflip);
-                    isflipped=false;
+                if(isFlipped){
+                    head.getTransforms().add(imFlip);
+                    body.getTransforms().add(imFlip);
+                    foot.getTransforms().add(imFlip);
+                    isFlipped=false;
                 }
                 moveX(-(random.nextInt(4) + 2));
-            }else{
+            } else if (posX <= 710){
                 //отзеркаливание противника
-                if(!isflipped){
-                    head.getTransforms().add(imflip);
-                    body.getTransforms().add(imflip);
-                    foot.getTransforms().add(imflip);
-                    isflipped =true;
+                if(!isFlipped){
+                    head.getTransforms().add(imFlip);
+                    body.getTransforms().add(imFlip);
+                    foot.getTransforms().add(imFlip);
+                    isFlipped =true;
                 }
                 moveX(random.nextInt(4) + 2);
             }

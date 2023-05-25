@@ -49,9 +49,9 @@ public class HelloApplication extends Application {
         Font mainFont = Font.loadFont("file:src/main/java/com/example/mygame/main_font.ttf", 75);
 
         //Экран поражения
-        ImageView engBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/black.png"), 2000, 2000, true, true)); engBackgroundImage.setLayoutX(-40);
-        Label deathInfo = new Label("Смерть"); deathInfo.setFont(mainFont); deathInfo.setTextFill(Color.rgb(98, 17, 17)); deathInfo.setLayoutX(625); deathInfo.setLayoutY(370);
-        endGame.getChildren().addAll(engBackgroundImage, deathInfo);
+        ImageView engBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/black.png")));
+        Label deathInfo = new Label("Смерть"); deathInfo.setFont(mainFont); deathInfo.setTextFill(Color.rgb(98, 17, 17)); deathInfo.setLayoutX(830); deathInfo.setLayoutY(485);
+        endGame.getChildren().addAll(engBackgroundImage, deathInfo); endGame.getTransforms().add(scale);
 
         // Для главного меню
         ImageView menuBackgroundImage = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/menu_background.png"))); menuBackgroundImage.setLayoutX(-40);
@@ -93,20 +93,7 @@ public class HelloApplication extends Application {
         playerHeadInGame.setScaleX(0.3); playerHeadInGame.setScaleY(0.3); playerHeadInGame.setLayoutX(740); playerHeadInGame.setLayoutY(412);
         ImageView playerWeaponInGame = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/weapon_0.png")));
         playerWeaponInGame.setScaleX(0.3); playerWeaponInGame.setScaleY(0.3); playerWeaponInGame.setLayoutX(740); playerWeaponInGame.setLayoutY(410);
-        ImageView[] floorImage = new ImageView[4];
-        for (int i = 0; i < 4; i++){
-            floorImage[i] = new ImageView(new Image(new FileInputStream("src/main/java/com/example/mygame/floor.png")));
-        }
-        int[] floorCoords = {-1000, -200}; // X и Y
-        floorImage[0].setLayoutY(floorCoords[1]);
-        floorImage[1].setLayoutY(floorCoords[1]);
-        floorImage[2].setLayoutY(floorCoords[1] + 2990);
-        floorImage[3].setLayoutY(floorCoords[1] + 2990);
-        floorImage[0].setLayoutX(floorCoords[0]);
-        floorImage[1].setLayoutX(floorCoords[0] + 2990);
-        floorImage[2].setLayoutX(floorCoords[0]);
-        floorImage[3].setLayoutX(floorCoords[0] + 2990);
-        gamePlay.getChildren().addAll(blackBackground, floorImage[0], floorImage[1], floorImage[2], floorImage[3]);
+        gamePlay.getChildren().add(blackBackground);
         Enemy[] enemy = {new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0), new Enemy(0, 0)};
         for (int i = 0; i < 8; i++){
             switch ((int)(random() * 8)){
@@ -184,57 +171,30 @@ public class HelloApplication extends Application {
                 // Перемещение всего при движении
                 killerLabel.setText(Integer.toString(killerCount[0]));
                 for(int i = 0; i < 8; i++){
-                    enemy[i].pursuit(hero.getBodyY(), (short) playerBodyInGame.getLayoutX());
+                    enemy[i].pursuit();
                     if(enemy[i].intersect()){
                         maunScene.setRoot(endGame);
                     }
                 }
                 if(pressed[0]){
-                    floorCoords[1] += 10;
                     for (int i = 0; i < 8; i++) {
                         enemy[i].moveY((short) 10);
                     }
                 }
                 if(pressed[1]){
-                    floorCoords[0] += 10;
                     for (int i = 0; i < 8; i++) {
                         enemy[i].moveX((short) 10);
                     }
                 }
                 if(pressed[2]){
-                    floorCoords[1] -= 10;
                     for (int i = 0; i < 8; i++) {
                         enemy[i].moveY((short) -10);
                     }
                 }
                 if(pressed[3]){
-                    floorCoords[0] -= 10;
                     for (int i = 0; i < 8; i++) {
                         enemy[i].moveX((short) -10);
                     }
-                }
-                // Создает бесконечность поля
-                if(floorCoords[1] >= -30){
-                    floorCoords[1] -= 2990;
-                }
-                if(floorCoords[0] >= -30){
-                    floorCoords[0] -= 2990;
-                }
-                if(floorCoords[1] <= -4800){
-                    floorCoords[1] += 2990;
-                }
-                if(floorImage[0].getLayoutX() <= -4000){
-                    floorCoords[0] += 2990;
-                }
-                if(pressed[0] || pressed[1] || pressed[2] || pressed[3]){
-                    floorImage[0].setLayoutY(floorCoords[1]);
-                    floorImage[1].setLayoutY(floorCoords[1]);
-                    floorImage[2].setLayoutY(floorCoords[1] + 2990);
-                    floorImage[3].setLayoutY(floorCoords[1] + 2990);
-                    floorImage[0].setLayoutX(floorCoords[0]);
-                    floorImage[1].setLayoutX(floorCoords[0] + 2990);
-                    floorImage[2].setLayoutX(floorCoords[0]);
-                    floorImage[3].setLayoutX(floorCoords[0] + 2990);
                 }
                 // Проверка положения тела персонажа на наклон и поворот
                 if(pressed[1]){
