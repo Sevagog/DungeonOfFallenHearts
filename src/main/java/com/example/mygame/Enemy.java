@@ -32,28 +32,9 @@ public class Enemy {
         foot.setScaleX(0.3); foot.setScaleY(0.3); foot.setLayoutX(posX+10); foot.setLayoutY(posY+30);
     }
 
-    public boolean intersect(short hHeadY, short hHeadX, short hFootY, short hFootX){
-        if(((foot.getLayoutY() + 35) > hHeadY) && ((foot.getLayoutY() + 35) <= hHeadY + height)){
-            if(isflipped){
-                if(((body.getLayoutX() + 35) >= hHeadX) && ((body.getLayoutX() + 35) <= (hHeadX + length))){
-                    return true;
-                }
-            }else{
-                if(((body.getLayoutX() - 35) >= (hHeadX + length)) && ((body.getLayoutX() - 35) <= (hHeadX))){
-                    return true;
-                }
-            }
-
-        } else if ((head.getLayoutY() <= (hHeadY + height)) && (head.getLayoutY() >= hHeadY) ) {
-            if(isflipped){
-                if(((body.getLayoutX() + 35) >= hHeadX) && ((body.getLayoutX() + 35) <= (hHeadX + length))){
-                    return true;
-                }
-            }else{
-                if(((body.getLayoutX() - 35) >= (hHeadX + length)) && ((body.getLayoutX() - 35) <= (hHeadX))){
-                    return true;
-                }
-            }
+    public boolean intersect(){
+        if(posX > 700 && posX < 800 && posY > 400 && posY < 600){
+            return true;
         }
         return false;
     }
@@ -87,13 +68,15 @@ public class Enemy {
     public void moveX(int moveX) {
         this.posX += moveX;
         if(isflipped){
-            head.setLayoutX(posX+30);
-            foot.setLayoutX(posX+40);
+            head.setLayoutX(posX+130);
+            foot.setLayoutX(posX+140);
+            body.setLayoutX(posX + 100);
         }else{
             head.setLayoutX(posX+70);
             foot.setLayoutX(posX+133);
+            body.setLayoutX(posX);
         }
-        body.setLayoutX(posX);
+
     }
     public void moveY(int moveY) {
         this.posY += moveY;
@@ -103,8 +86,8 @@ public class Enemy {
     }
 
     public void pursuit(short hBodyY, short hBodyX){
-        if(body.getLayoutY() <= hBodyY){
-            if(body.getLayoutX() >= hBodyX + 10){
+        if(posY <= hBodyY){
+            if(posX >= hBodyX){
                 //возврат в исходное его положение
                 if(isflipped){
                     head.getTransforms().add(imflip);
@@ -112,8 +95,8 @@ public class Enemy {
                     foot.getTransforms().add(imflip);
                     isflipped=false;
                 }
-                moveX(-random.nextInt(4));
-            }else{
+                moveX(-(random.nextInt(4) + 2));
+            }else if((posX + 10) <= hBodyX){
                 // отзеркаливание противника - направление движения вправо
                 if(!isflipped){
                     head.getTransforms().add(imflip);
@@ -121,12 +104,12 @@ public class Enemy {
                     foot.getTransforms().add(imflip);
                     isflipped =true;
                 }
-                moveX(random.nextInt(4));
+                moveX(random.nextInt(4) + 2);
             }
-            moveY(random.nextInt(4));
+            moveY(random.nextInt(4) + 2);
 
-        } else if(body.getLayoutY() >= hBodyY){
-            if(body.getLayoutX() >= hBodyX + 10){
+        } else if(posY >= hBodyY){
+            if(posX >= hBodyX + 10){
                 //возрат в исходное положение
                 if(isflipped){
                     head.getTransforms().add(imflip);
@@ -134,7 +117,7 @@ public class Enemy {
                     foot.getTransforms().add(imflip);
                     isflipped=false;
                 }
-                moveX(-random.nextInt(4));
+                moveX(-(random.nextInt(4) + 2));
             }else{
                 //отзеркаливание противника
                 if(!isflipped){
@@ -143,9 +126,9 @@ public class Enemy {
                     foot.getTransforms().add(imflip);
                     isflipped =true;
                 }
-                moveX(random.nextInt(4));
+                moveX(random.nextInt(4) + 2);
             }
-            moveY(-random.nextInt(4));
+            moveY(-(random.nextInt(4) + 2));
         }
     }
 }
